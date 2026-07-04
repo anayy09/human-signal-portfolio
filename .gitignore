@@ -101,3 +101,5 @@ storybook-static/
 # Optional Generated Assets
 # =========================================================
 public/*.pdf
+
+profile/
