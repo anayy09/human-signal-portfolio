@@ -16,9 +16,6 @@ export default defineConfig({
             ) {
               return 'three';
             }
-            if (id.includes('react-simple-maps') || id.includes('d3-') || id.includes('topojson')) {
-              return 'maps';
-            }
           }
           return undefined;
         },

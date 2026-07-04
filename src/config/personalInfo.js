@@ -502,6 +502,21 @@ const personalInfo = {
     { title: "Runner-Up · National Startup Day Exhibition", org: "AIC-JKLU", year: "2022" },
   ],
 
+  // Ordered career waypoints, animated as great-circle arcs on the globe.
+  // placeId references visitedPlaces entries.
+  itinerary: [
+    { placeId: "place-2", year: "2003", label: "Origin" },
+    { placeId: "place-1", year: "2021", label: "B.Tech · JK Lakshmipat University" },
+    { placeId: "place-7", year: "2022", label: "Exchange · IIT Gandhinagar" },
+    { placeId: "place-6", year: "2023", label: "SDE Intern · Dexpert Systems" },
+    { placeId: "place-33", year: "2023", label: "Research Intern · IIT Jammu" },
+    { placeId: "place-26", year: "2024", label: "Exchange · IIT Kanpur" },
+    { placeId: "place-8", year: "2024", label: "Research Intern · SVNIT Surat" },
+    { placeId: "place-29", year: "2024", label: "SDE Intern · GeeksforGeeks" },
+    { placeId: "place-5", year: "2024", label: "RA · SBILab, IIIT Delhi" },
+    { placeId: "place-50", year: "2025", label: "MS CS · University of Florida", current: true },
+  ],
+
   visitedPlaces: [
     { id: "place-1", name: "Jaipur, India", coordinates: [75.7873, 26.9124], story: "Home base", significance: "Home" },
     { id: "place-2", name: "Bhopal, India", coordinates: [77.401989, 23.2584857], story: "Birthplace" },
