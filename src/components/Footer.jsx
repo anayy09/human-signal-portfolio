@@ -2,23 +2,22 @@ import React from 'react';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
 import { FiArrowUp } from 'react-icons/fi';
+import personalInfo from '../config/personalInfo';
 
 const FooterContainer = styled.footer`
-  padding: 2rem 2rem;
-  background: rgba(10, 11, 15, 0.6);
-  backdrop-filter: blur(12px);
+  padding: 2rem;
   border-top: 1px solid rgba(91, 141, 239, 0.07);
   position: relative;
 `;
 
 const FooterContent = styled.div`
-  max-width: 1140px;
+  max-width: 1160px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  @media (max-width: ${props => props.theme.breakpoints.mobile}) {
+  @media (max-width: ${p => p.theme.breakpoints.mobile}) {
     flex-direction: column;
     gap: 0.75rem;
     text-align: center;
@@ -32,44 +31,43 @@ const FooterLeft = styled.div`
 `;
 
 const FooterCopy = styled.p`
-  font-family: ${props => props.theme.fonts.code};
+  font-family: ${p => p.theme.fonts.code};
   font-size: 0.72rem;
   letter-spacing: 0.06em;
-  color: ${props => props.theme.colors.subtle};
-  max-width: none;
-  margin: 0;
+  color: ${p => p.theme.colors.subtle};
 `;
 
 const FooterStack = styled.p`
-  font-family: ${props => props.theme.fonts.code};
+  font-family: ${p => p.theme.fonts.code};
   font-size: 0.68rem;
   letter-spacing: 0.04em;
-  color: rgba(74, 85, 104, 0.7);
-  max-width: none;
-  margin: 0;
+  color: ${p => p.theme.colors.faint};
 
-  span {
-    color: rgba(91, 141, 239, 0.5);
+  a {
+    color: rgba(91, 141, 239, 0.55);
+
+    &:hover {
+      color: ${p => p.theme.colors.primary};
+    }
   }
 `;
 
 const ScrollToTop = styled(motion.button)`
   width: 34px;
   height: 34px;
-  border-radius: ${props => props.theme.radius.md};
+  border-radius: ${p => p.theme.radius.md};
   border: 1px solid rgba(91, 141, 239, 0.15);
   background: transparent;
-  color: ${props => props.theme.colors.muted};
+  color: ${p => p.theme.colors.muted};
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
 
   &:hover {
     border-color: rgba(91, 141, 239, 0.4);
-    color: ${props => props.theme.colors.primary};
+    color: ${p => p.theme.colors.primary};
     background: rgba(91, 141, 239, 0.06);
   }
 `;
@@ -81,9 +79,12 @@ const Footer = () => {
     <FooterContainer>
       <FooterContent>
         <FooterLeft>
-          <FooterCopy>© {year} Anay Sinhal</FooterCopy>
+          <FooterCopy>© {year} Anay Sinhal · end of transmission</FooterCopy>
           <FooterStack>
-            Built with <span>React</span> · <span>Three.js</span> · <span>Framer Motion</span>
+            React · Three.js · Framer Motion ·{' '}
+            <a href={personalInfo.repo} target="_blank" rel="noopener noreferrer">
+              view source
+            </a>
           </FooterStack>
         </FooterLeft>
 
