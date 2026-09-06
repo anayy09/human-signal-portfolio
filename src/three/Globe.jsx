@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Html } from '@react-three/drei';
+import { OrbitControls } from '@react-three/drei/core/OrbitControls';
+import { Html } from '@react-three/drei/web/Html';
 
 /*
  * Orbital navigation globe: dot-matrix Earth, waypoint markers, and the
@@ -10,9 +11,9 @@ import { OrbitControls, Html } from '@react-three/drei';
  */
 
 const R = 2;
-const LAVENDER = '#C9A0DC';
-const GOLD = '#D4A574';
-const BLUE = '#5B8DEF';
+const WAYPOINT = '#7faeba';
+const ROUTE = '#53E3D5';
+const CURRENT = '#8CA9FF';
 
 const latLonToVec3 = (lat, lon, radius = R) => {
   const phi = (lat * Math.PI) / 180;
@@ -42,7 +43,7 @@ function LandDots({ dots }) {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        color="#4A6BA8"
+        color="#3d8790"
         size={0.02}
         sizeAttenuation
         transparent
@@ -58,12 +59,20 @@ function Core() {
   return (
     <mesh>
       <sphereGeometry args={[R * 0.992, 48, 48]} />
-      <meshBasicMaterial color="#0B0E16" />
+      <meshBasicMaterial color="#09161c" />
     </mesh>
   );
 }
 
-function Marker({ place, career, current, focused, onHover }) {
+function Marker({
+  place,
+  career,
+  current,
+  focused,
+  onHover,
+  onSelect,
+  playing,
+}) {
   const ref = useRef();
   const pos = useMemo(
     () => latLonToVec3(place.coordinates[1], place.coordinates[0], R * 1.005),
@@ -78,13 +87,14 @@ function Marker({ place, career, current, focused, onHover }) {
       ),
     [pos]
   );
-  const color = current ? BLUE : career ? GOLD : LAVENDER;
+  const color = current ? CURRENT : career ? ROUTE : WAYPOINT;
   const base = current ? 0.045 : career ? 0.036 : 0.024;
 
   useFrame(({ clock }) => {
     if (!ref.current) return;
     let s = 1;
-    if (current) s = 1 + Math.sin(clock.getElapsedTime() * 2.4) * 0.3;
+    if (current && playing)
+      s = 1 + Math.sin(clock.getElapsedTime() * 2.4) * 0.3;
     if (focused) s = 1.8;
     ref.current.scale.setScalar(s);
   });
@@ -93,11 +103,15 @@ function Marker({ place, career, current, focused, onHover }) {
     <group position={pos}>
       <mesh
         ref={ref}
-        onPointerOver={e => {
+        onClick={(e) => {
+          e.stopPropagation();
+          onSelect(place);
+        }}
+        onPointerOver={(e) => {
           e.stopPropagation();
           onHover(place);
         }}
-        onPointerOut={e => {
+        onPointerOut={(e) => {
           e.stopPropagation();
           onHover(null);
         }}
@@ -128,7 +142,7 @@ function useArcGeometry(from, to) {
     const v1 = latLonToVec3(from[1], from[0], 1).normalize();
     const v2 = latLonToVec3(to[1], to[0], 1).normalize();
     const angle = v1.angleTo(v2);
-    const lift = 0.16 + 0.3 * Math.min(1, angle / 1.6);
+    const lift = 0.08 + 0.16 * Math.min(1, angle / 1.6);
     const pts = new Float32Array(ARC_POINTS * 3);
     const tmp = new THREE.Vector3();
     for (let i = 0; i < ARC_POINTS; i += 1) {
@@ -145,24 +159,28 @@ function useArcGeometry(from, to) {
   }, [from, to]);
 }
 
-function ArcLeg({ from, to, index, total, reducedMotion }) {
+function ArcLeg({ from, to, index, total, playing }) {
   const geometry = useArcGeometry(from, to);
   const lineRef = useRef();
+  const elapsed = useRef(0);
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
-  useFrame(({ clock }) => {
+  useFrame((_, delta) => {
     const line = lineRef.current;
     if (!line) return;
-    if (reducedMotion) {
-      line.geometry.setDrawRange(0, ARC_POINTS);
-      line.material.opacity = 0.3;
+    if (!playing) {
+      if (elapsed.current === 0) {
+        line.geometry.setDrawRange(0, ARC_POINTS);
+        line.material.opacity = 0.3;
+      }
       return;
     }
     const LEG = 0.85; // seconds per leg
     const HOLD = 2.6; // pause with the full route lit
     const cycle = total * LEG + HOLD;
-    const t = clock.getElapsedTime() % cycle;
+    elapsed.current += Math.min(delta, 0.05);
+    const t = elapsed.current % cycle;
     const start = index * LEG;
 
     if (t < start) {
@@ -180,7 +198,7 @@ function ArcLeg({ from, to, index, total, reducedMotion }) {
   return (
     <line ref={lineRef} geometry={geometry} frustumCulled={false}>
       <lineBasicMaterial
-        color={GOLD}
+        color={ROUTE}
         transparent
         opacity={0}
         blending={THREE.AdditiveBlending}
@@ -197,10 +215,17 @@ function Atmosphere() {
     canvas.width = size;
     canvas.height = size;
     const ctx = canvas.getContext('2d');
-    const grad = ctx.createRadialGradient(size / 2, size / 2, size * 0.28, size / 2, size / 2, size / 2);
-    grad.addColorStop(0, 'rgba(123, 104, 182, 0.35)');
-    grad.addColorStop(0.6, 'rgba(91, 141, 239, 0.12)');
-    grad.addColorStop(1, 'rgba(91, 141, 239, 0)');
+    const grad = ctx.createRadialGradient(
+      size / 2,
+      size / 2,
+      size * 0.28,
+      size / 2,
+      size / 2,
+      size / 2
+    );
+    grad.addColorStop(0, 'rgba(53, 227, 213, 0.35)');
+    grad.addColorStop(0.6, 'rgba(53, 151, 164, 0.12)');
+    grad.addColorStop(1, 'rgba(53, 151, 164, 0)');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, size, size);
     return new THREE.CanvasTexture(canvas);
@@ -221,21 +246,42 @@ function Atmosphere() {
   );
 }
 
-function Scene({ dots, places, itinerary, focusPlace, reducedMotion, onHover }) {
+function Scene({
+  dots,
+  places,
+  itinerary,
+  focusPlace,
+  playing,
+  reducedMotion,
+  onHover,
+  onSelect,
+  replay,
+}) {
   const globeRef = useRef();
   const controlsRef = useRef();
-  const { camera, gl } = useThree();
+  const { camera, gl, invalidate, size } = useThree();
+  useEffect(() => {
+    camera.zoom = Math.min(1, size.width / size.height);
+    camera.updateProjectionMatrix();
+    invalidate();
+  }, [camera, size.width, size.height, invalidate]);
   const [tooltip, setTooltip] = useState(null);
+  useEffect(() => {
+    invalidate();
+  }, [focusPlace, playing, replay, invalidate]);
 
-  const careerIds = useMemo(() => new Set(itinerary.map(leg => leg.placeId)), [itinerary]);
+  const careerIds = useMemo(
+    () => new Set(itinerary.map((leg) => leg.placeId)),
+    [itinerary]
+  );
   const currentId = useMemo(
-    () => itinerary.find(leg => leg.current)?.placeId,
+    () => itinerary.find((leg) => leg.current)?.placeId,
     [itinerary]
   );
 
   const legs = useMemo(() => {
     const resolved = itinerary
-      .map(leg => places.find(p => p.id === leg.placeId))
+      .map((leg) => places.find((p) => p.id === leg.placeId))
       .filter(Boolean);
     return resolved.slice(0, -1).map((place, i) => ({
       from: place.coordinates,
@@ -244,7 +290,7 @@ function Scene({ dots, places, itinerary, focusPlace, reducedMotion, onHover }) 
     }));
   }, [itinerary, places]);
 
-  const handleHover = place => {
+  const handleHover = (place) => {
     setTooltip(place);
     onHover(place);
     gl.domElement.style.cursor = place ? 'pointer' : 'grab';
@@ -255,16 +301,24 @@ function Scene({ dots, places, itinerary, focusPlace, reducedMotion, onHover }) 
     const controls = controlsRef.current;
     if (!globe) return;
 
-    const target = focusPlace || tooltip;
+    const target = focusPlace;
     if (target) {
       // Rotate the globe so the focused city faces the camera
-      const local = latLonToVec3(target.coordinates[1], target.coordinates[0], 1).normalize();
+      const local = latLonToVec3(
+        target.coordinates[1],
+        target.coordinates[0],
+        1
+      ).normalize();
       const toCamera = camera.position.clone().normalize();
       const q = new THREE.Quaternion().setFromUnitVectors(local, toCamera);
-      globe.quaternion.slerp(q, 1 - Math.exp(-5 * delta));
+      if (reducedMotion) globe.quaternion.copy(q);
+      else {
+        globe.quaternion.slerp(q, 1 - Math.exp(-5 * delta));
+        if (globe.quaternion.angleTo(q) > 0.002) invalidate();
+      }
       if (controls) controls.autoRotate = false;
     } else if (controls) {
-      controls.autoRotate = !reducedMotion;
+      controls.autoRotate = playing && !tooltip;
     }
   });
 
@@ -276,15 +330,15 @@ function Scene({ dots, places, itinerary, focusPlace, reducedMotion, onHover }) 
         <LandDots dots={dots} />
         {legs.map((leg, i) => (
           <ArcLeg
-            key={leg.key}
+            key={leg.key + replay}
             from={leg.from}
             to={leg.to}
             index={i}
             total={legs.length}
-            reducedMotion={reducedMotion}
+            playing={playing}
           />
         ))}
-        {places.map(place => (
+        {places.map((place) => (
           <Marker
             key={place.id}
             place={place}
@@ -292,6 +346,8 @@ function Scene({ dots, places, itinerary, focusPlace, reducedMotion, onHover }) 
             current={place.id === currentId}
             focused={focusPlace?.id === place.id}
             onHover={handleHover}
+            onSelect={onSelect}
+            playing={playing}
           />
         ))}
         {tooltip && (
@@ -307,7 +363,7 @@ function Scene({ dots, places, itinerary, focusPlace, reducedMotion, onHover }) 
             <div
               style={{
                 background: 'rgba(8, 12, 20, 0.95)',
-                border: '1px solid rgba(201, 160, 220, 0.25)',
+                border: '1px solid rgba(83, 227, 213, 0.25)',
                 borderRadius: 8,
                 padding: '0.5rem 0.7rem',
                 whiteSpace: 'nowrap',
@@ -338,8 +394,8 @@ function Scene({ dots, places, itinerary, focusPlace, reducedMotion, onHover }) 
         enableZoom={false}
         enablePan={false}
         rotateSpeed={0.45}
-        autoRotate={!reducedMotion}
-        autoRotateSpeed={0.5}
+        autoRotate={playing && !focusPlace}
+        autoRotateSpeed={1.2}
         minPolarAngle={Math.PI * 0.28}
         maxPolarAngle={Math.PI * 0.72}
       />
@@ -347,8 +403,18 @@ function Scene({ dots, places, itinerary, focusPlace, reducedMotion, onHover }) 
   );
 }
 
-export default function Globe({ places, itinerary, focusPlace, onHover, active }) {
+export default function Globe({
+  places,
+  itinerary,
+  focusPlace,
+  onHover = () => {},
+  onSelect = () => {},
+  active,
+  playing = true,
+  replay = 0,
+}) {
   const [dots, setDots] = useState(null);
+  const [failed, setFailed] = useState(false);
   const reducedMotion = useMemo(
     () =>
       typeof window !== 'undefined' &&
@@ -359,23 +425,35 @@ export default function Globe({ places, itinerary, focusPlace, onHover, active }
   useEffect(() => {
     let live = true;
     fetch('/maps/globe-dots.json')
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => {
+        if (!res.ok) throw new Error('Map unavailable');
+        return res.json();
+      })
+      .then((data) => {
         if (live) setDots(data);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (live) setFailed(true);
+      });
     return () => {
       live = false;
     };
   }, []);
 
-  if (!dots) return null;
+  if (failed)
+    return (
+      <p className="globe-message">
+        The globe could not load. All places remain available in the Exploration
+        Log.
+      </p>
+    );
+  if (!dots) return <p className="globe-message">Loading the world…</p>;
 
   return (
     <Canvas
-      camera={{ position: [0, 0.5, 5.3], fov: 42 }}
+      camera={{ position: [0, 0.5, 7.4], fov: 42 }}
       dpr={[1, 1.5]}
-      frameloop={active && !reducedMotion ? 'always' : 'demand'}
+      frameloop={active && playing ? 'always' : 'demand'}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
       style={{ cursor: 'grab' }}
     >
@@ -386,6 +464,9 @@ export default function Globe({ places, itinerary, focusPlace, onHover, active }
         focusPlace={focusPlace}
         reducedMotion={reducedMotion}
         onHover={onHover}
+        onSelect={onSelect}
+        playing={playing}
+        replay={replay}
       />
     </Canvas>
   );

@@ -1,5 +1,7 @@
 # Cosmic Portfolio — Full Refactor Plan
 
+> Historical plan for the previous design. The current MedTech story is specified in PRODUCT.md and DESIGN.md.
+
 *Prepared July 2026. Source of truth for content: `profile/` (gitignored — never commit, never quote verbatim into public assets beyond what is already public record: publications, patents, roles).*
 
 ---

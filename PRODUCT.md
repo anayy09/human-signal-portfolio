@@ -1,34 +1,20 @@
-# PRODUCT.md — Cosmic Portfolio (anay.codes)
+# Human Signal · Portfolio purpose
 
-register: brand
+The portfolio introduces Anay Sinhal's clinical AI research and software engineering through a progressive MedTech story.
 
-## Product purpose
+## Audience
 
-Personal portfolio of **Anay Sinhal**: clinical AI researcher and software engineer (MS CS, University of Florida; Graduate Student Assistant at UF Intelligent Clinical Care Center / PRISMAp Lab). The site's job is to make a recruiter, PI, or hiring manager think "this person does serious research *and* ships serious software" within one scroll, and to be memorable enough to revisit.
+Recruiters can find selected systems, skills, availability, and the CV quickly. Research collaborators can inspect the methods, publications, patent records, and contact details. Curious visitors can explore the neural artwork, career milestones, and the restored Exploration Log and its interactive globe.
 
-## Users
+## Product promises
 
-- Recruiters and hiring managers (full-time roles from Dec 2026): skim in 60 seconds, need credibility signals fast (Scientific Reports first-author paper, granted patent, IC3 lab work).
-- Research PIs and collaborators: check publications, methods vocabulary, ORCID.
-- Peers and the curious: the site itself is the proof of frontend craft.
+- Research rigor and engineering practice remain the center of the story.
+- Original visual artwork translates research themes into an accessible digital experience.
+- Existing public facts remain in personalInfo.js; inspiration sources do not become a new source of unverified claims.
+- Every primary interaction works with keyboard, touch, and reduced motion.
+- Scientific diagrams never imply live patient measurements.
+- A direct route to contact and the CV remains available.
+- Contact failures preserve entered text and offer an alternative.
+- No intro gate, scroll hijacking, autoplay audio, or mandatory story sequence.
 
-## Brand voice
-
-Three words: **engraved, nocturnal, exacting.**
-
-The site is "The Observatory Console": a research instrument observing a career. One continuous WebGL night sky; each section is a different instrument panel of the same observatory (telemetry, star chart, specimen grid, publication ledger, navigation map). Cinematic pacing, research-lab information density. Metrics are data, not prose.
-
-## Anti-references (what this must NOT look like)
-
-- Generic SaaS landing page: cream whitespace, icon-title-text card grids, gradient text.
-- Template developer portfolio: skill progress bars, logo walls, "passionate developer" copy.
-- Editorial-magazine affectation: italic display serif + drop caps + broadsheet rules (the 2026 default).
-- Neon cyberpunk / synthwave space: the sky here is a quiet, precise instrument reading, not a rave.
-
-## Strategic principles
-
-1. The cosmic canvas is CORE identity, never removed; it must *react to scroll* rather than idle.
-2. All content flows from `src/config/personalInfo.js`; components never hardcode facts.
-3. Research credibility leads: the Scientific Reports paper and granted German utility model get featured treatment.
-4. Purposeful motion only; honors `prefers-reduced-motion` end to end (Framer + canvas).
-5. Fast: three.js code-split, maps lazy-loaded, LCP < 2s.
+The older REFACTOR_PLAN.md is a historical record of the previous portfolio, not the specification for this redesign.

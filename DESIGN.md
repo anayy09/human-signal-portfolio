@@ -1,52 +1,44 @@
-# DESIGN.md — The Observatory Console
+# Human Signal · Design system
 
-## Theme
+## Direction
 
-Dark, always. Scene sentence: *a researcher reading instrument panels in a dark observatory dome at 2am, starlight the only ambient source.* Dark is not an aesthetic default here; the product IS a night sky.
+An immersive MedTech research story for Anay Sinhal. The visual metaphor is a research instrument finding human meaning in complex signals. This replaces the previous observatory design.
 
-## Color
+The source inspiration is methodological: privacy-preserving learning, physiological signals, foundation-model adaptation, and high-performance computation. Do not copy unpublished manuscripts, results, patient data, or private worklogs into the product.
 
-Strategy: **Committed dark drench** — deep space-navy is the surface; one blue accent carries hierarchy; teal and lavender are semantic, not decorative.
+## Narrative
 
-- Surface: `#0A0B0F` (near-black, blue-tinted) → `#0E1520` panels
-- Primary / instrument blue: `#5B8DEF` (links, active states, hero accents)
-- Clinical teal: `#0D9488` — used ONLY for health/clinical-AI entities
-- Lavender: `#C9A0DC` / `#7B68B6` — used ONLY for personality/journey entities
-- Gold: `#D4A574` — used ONLY for honors (granted patent, gold medal, featured pub)
-- Text: `#E8ECF4` high, `#98A2B8` mid, mono labels may sit lower-contrast when ≥ AA
-- Never pure #000/#fff. Section accent tints the WebGL nebula as you scroll.
+1. The spark: human-centered intelligence and the researcher behind it.
+2. The experiments: working software and explorable project studies.
+3. The evidence: research themes, publication records, and inventions.
+4. The evolution: selectable professional and academic milestones.
+5. Expeditions: an interactive atlas and Exploration Log using the same chapter typography, cyan accents, panel surfaces, and controls.
+6. What comes next: a direct invitation to collaborate.
 
-## Typography
+A reader may scroll through the story or navigate directly. Never hijack wheel input, force an intro sequence, add audio without consent, or delay access to the CV.
 
-Three deliberate voices (a named system, not a default pairing):
+## Visual language
 
-1. **Display — Bricolage Grotesque** (variable: opsz/wght): characterful display grotesk for the hero name and section titles ≥ 2rem. Emphasis inside titles is COLOR or extreme weight contrast (720 vs 260), never italic (the family has none; no synthetic oblique).
-2. **UI/body — Space Grotesk** (existing committed identity): instrument-panel UI. Weights 300–700.
-3. **Telemetry — Fira Code**: readouts, coordinates, dates, metrics, section indices. Literal register reason: the site is an instrument console.
+- Clinical ink: #070c10.
+- Instrument surface: #0b1319.
+- Human signal: #53e3d5.
+- Secondary signals: emerald and muted laser blue.
+- Reading text: #e8eeef; secondary text: #91a2ad.
+- Fine borders, restrained surface gradients, sparse glass telemetry.
+- Display: locally served Bricolage Grotesque.
+- Interface: locally served Space Grotesk.
+- Coordinates and metadata: locally served Fira Code.
 
-Chosen with the user after rejecting Bodoni Moda (read as fashion-editorial, not instrument).
+The brain sculpture and project diagrams are original procedural artwork. Their labels distinguish them from real clinical measurements. Medical signals are an aesthetic and conceptual thread, not a claim of clinical validation.
 
-Fluid modular scale (ratio ≥ 1.28), `clamp()` on all display sizes. Body max 70ch. Line-height +0.05 on dark.
+## Interaction
 
-## Section grammar (named system: "instrument index")
+Canvas presents three distinct geometries: intelligence, physiological signals, and distributed systems. Dragging rotates the structure; playback and speed control simulation time. The sticky Research Story has its own visual vocabulary: a continuous signal surface, layered latent contours, and a volumetric compute lattice. These independent Canvas studies crossfade with natural scroll; they do not reuse the hero artwork. Rendering frequency and pixel ratio are bounded. Pause, offscreen detection, hidden-tab detection, stop ongoing rendering. All three artwork sections start playing by default and expose pause controls. Reduced-motion preferences continue to simplify layout transitions without disabling artifact playback. Framer Motion provides small, non-blocking entrances and milestone changes. Native HTML controls provide keyboard behavior.
 
-Every section opens with a Fira Code index line: `01 / ORIENTATION` style — index number, tick rule, label. This is deliberate observatory-console grammar, applied consistently, while section *layouts* vary widely (asymmetric intro, spine timeline, bento specimens, ledger rows, full-bleed map).
+Project studies use native dialogs with focus trapping, Escape dismissal, and focus restoration. Publication and patent disclosures use native details elements. Filters and research lenses expose pressed states.
 
-## Surfaces
+## Layout
 
-Flat instrument panels: `rgba(14,20,32,0.72)` fills, 1px hairline borders `rgba(91,141,239,0.10)`, no drop-shadow soup, no default glassmorphism (backdrop-blur reserved for the fixed nav only). Hover: cursor-tracked radial spotlight on the border/panel, not y-translation.
+The hero combines a typographic introduction and neural artwork. Subsequent chapters vary between a short mission statement, project grid, research instrument, publication ledger, selectable timeline, unified exploration atlas, and conversation panel. The atlas and log share one bordered surface; selecting a place links its marker, entry, and coordinate readout. The globe fits the narrower viewport dimension and loads only near the section. On small screens, the neural artwork follows the headline and career nodes become a horizontally scrollable selection strip.
 
-Bans honored: no side-stripe accent borders, no gradient text, no icon-heading-text card grids, no progress bars for skills, no em dashes in copy.
-
-## Motion
-
-- Ease: `cubic-bezier(0.16, 1, 0.3, 1)` (out-expo family). No bounce.
-- Scroll is the narrative driver: canvas camera drift + nebula tint keyed to section in view; timeline constellation draws with scroll (`pathLength`); counters count on entry.
-- Entrance: one orchestrated stagger per section, 0.5–0.7s, y ≤ 20px.
-- `<MotionConfig reducedMotion="user">` global; canvas renders a static frame under reduced motion.
-
-## Iconography & imagery
-
-- react-icons (Fi/Si) at small sizes only; never decorative icon tiles.
-- Project screenshots from `public/projects/`; the WebGL sky is the hero imagery.
-- OG image: 1200×630 dark starfield with engraved name.
+Maintain a single content source in personalInfo.js. Put presentation copy in story.js. Keep decorative measurement labels subordinate to actual career facts.
